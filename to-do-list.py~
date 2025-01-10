@@ -52,11 +52,11 @@ add_button = tk.Button(frame,text = "add task", command = add_task,
 add_button.pack(side = tk.LEFT,padx=5)
 
 remove_button = tk.Button(frame,text = "remove task", command = remove_task,
-                       font=("Arial",12))
-remove_button.pack(pady=10)
+                       font=("Arial",12),selectmode = tk.SINGLE)
+remov_button.pack(pady=10)
 
 clear_button = tk.Button(frame,text = "clear task", command = clear_task,
-                       font=("Arial",12))
+                       font=("Arial",12),selectmode = tk.SINGLE)
 clear_button.pack(pady=10)
 
 app.mainloop()
