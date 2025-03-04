@@ -15,21 +15,21 @@ def update_task():
 def add_task():
     task = task_entry.get()
     if task.strip():
-        task.append(task)
+        tasks.append(task)
         update_task()
         task_entry.delete(0,tk.END)
     else:
         messagebox.showwarning("No task selected !!")
 
 def clear_task():
-    if messagebx.askeysno("Confirm ?"):
-        task.clear()
+    if messagebox.askyesno("Confirm ?"):
+        tasks.clear()
         update_task()
 
 def remove_task():
     try:
-        selected_task  = task_list.clear_task()[0]
-        tasks.pop(selected_taks_index)
+        selected_task  = task_list.curselection()[0]
+        tasks.pop(selected_task)
         update_task()
     except IndexError:
         messagebox.showwarning("No task selected")
