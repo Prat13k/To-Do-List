@@ -1,6 +1,6 @@
-from flask import jsonify, requests Flask 
+from flask import Flask, jsonify, request
 
-app = flask(__name__)
+app = Flask(__name__)
 
 tasks= []
 
@@ -14,7 +14,7 @@ def add_tasks():
     task_name = data.get('name')
     if not task_name:
         return jsonify({'error':'Task name is req'}),400
-    task = {'id':len(task) + 1,'name' ; task_name}
+    task = {'id':len(tasks) + 1,'name' : task_name}
     tasks.append(task)
     return jsonify(task),201
 
@@ -22,8 +22,8 @@ def add_tasks():
 def remove_tasks(task_id):
     global tasks
     tasks = [task for task in tasks if task["id"] != task_id]
-    return jsonify({'message':f'task' {task_id} removed"}),200
-                    
-if __name__ == 'main'
+    return jsonify({'message':f'task {task_id} removed'}),200
+
+if __name__ == 'main':
     app.run(debug = True)
     
