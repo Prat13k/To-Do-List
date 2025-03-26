@@ -1,7 +1,6 @@
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
-
 tasks= []
 
 @app.route('/tasks', methods = ['GET'])
@@ -26,4 +25,3 @@ def remove_tasks(task_id):
 
 if __name__ == 'main':
     app.run(debug = True)
-    
