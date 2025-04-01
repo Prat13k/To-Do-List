@@ -3,7 +3,7 @@ from tkinter import messagebox, ttk
 
 app = tk.Tk()
 app.title("To-do List")
-app.geometry("500x500")
+app.geometry("400x400")
 
 tasks = []
 undo_stack = []
