@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -60,3 +61,6 @@ var/
 
 # Briefcase log files
 logs/
+=======
+.qodo
+>>>>>>> 5e37eb78ed89a37605fe190dc64f5d06aad45ba0
