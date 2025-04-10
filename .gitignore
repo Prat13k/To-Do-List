@@ -1,66 +1,32 @@
-<<<<<<< HEAD
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+test-results
+node_modules
 
-# OSX useful to ignore
-*.DS_Store
-.AppleDouble
-.LSOverride
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
 
-# Thumbnails
-._*
+# OS
+.DS_Store
+Thumbs.db
 
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
-.com.apple.timemachine.donotpresent
+# Env
+.env
+.env.*
+!.env.example
+!.env.test
 
-# Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
-Network Trash Folder
-Temporary Items
-.apdisk
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
 
-# C extensions
-*.so
+# SQLite
+*.db
 
-# Distribution / packaging
-.Python
-env/
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.dist-info/
-*.egg-info/
-.installed.cfg
-*.egg
+# Paraglide
+src/lib/paraglide
 
-# IntelliJ Idea family of suites
-.idea
-*.iml
-## File-based project format:
-*.ipr
-*.iws
-## mpeltonen/sbt-idea plugin
-.idea_modules/
-
-# Briefcase log files
-logs/
-=======
-.qodo
->>>>>>> 5e37eb78ed89a37605fe190dc64f5d06aad45ba0
+*storybook.log
