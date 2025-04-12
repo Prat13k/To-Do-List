@@ -1,0 +1,15 @@
+export default {
+  addTask: 'Agregar tarea',
+  editTask: 'Editar tarea',
+  priority: 'Prioridad',
+  low: 'Baja',
+  medium: 'Media',
+  high: 'Alta',
+  cancel: 'Cancelar',
+  update: 'Actualizar',
+  settings: 'Configuraciones',
+  language: 'Idioma',
+  theme: 'Tema',
+  clearAll: 'Eliminar todas las tareas',
+  noTasks: 'Aún no hay tareas. ¡Empieza agregando una!',
+};

@@ -1,0 +1,15 @@
+export default {
+  addTask: 'Add Task',
+  editTask: 'Edit Task',
+  priority: 'Priority',
+  low: 'Low',
+  medium: 'Medium',
+  high: 'High',
+  cancel: 'Cancel',
+  update: 'Update',
+  settings: 'Settings',
+  language: 'Language',
+  theme: 'Theme',
+  clearAll: 'Clear All Tasks',
+  noTasks: 'No tasks yet. Start by adding one!',
+};

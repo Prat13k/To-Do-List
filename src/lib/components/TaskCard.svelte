@@ -1,6 +1,7 @@
 <script lang = "ts">
 	import type {Task} from '$stores/taskStore';
 	import {createEventDispatcher} from 'svelte';
+	import PriorityTag from '$components/PriorityTag.svelte';
 	
 	export let task: Task;
 	const dispatch = createEventDispatcher();
@@ -21,17 +22,12 @@
 			</p>
 		{/if}
 		
-		<div class = "mt-2 inline-block text-xs font-semihold px-3 py-1 rounded-full "
-			class:bg-green-200 = {task.priority === 'low'}
-			class:bg-yellow-200 = {task.priority === 'medium'} 
-			class:bg-red-200 = {task.priority === 'high'}
-		>
-			{task.priority.toUpperCase()}
-		</div>
+		<PriorityTag priority={task.priority} />
+
 	</div>
 	
 	<div class = 'flex flex-col gap-1 items-end ml-4'>
 		<button on:click = {handleEdit} class = 'text-blue-600 hover:text-blue-800 text-sm'>✏️</button>
-		<button on:click = {handleEdit} class = 'text-blue-600 hover:text-blue-800 text-sm'>🗑️</button>
+		<button on:click = {handleDelete} class = 'text-blue-600 hover:text-blue-800 text-sm'>🗑️</button>
 	</div>
 </div>

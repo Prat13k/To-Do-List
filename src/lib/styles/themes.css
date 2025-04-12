@@ -1,0 +1,14 @@
+[data-theme='light'] {
+  --bg: #ffffff;
+  --text: #1a1a1a;
+}
+
+[data-theme='dark'] {
+  --bg: #1e1e1e;
+  --text: #f1f1f1;
+}
+
+[data-theme='night'] {
+  --bg: #0c0c1c;
+  --text: #e4e4e4;
+}

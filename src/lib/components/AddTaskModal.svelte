@@ -1,6 +1,8 @@
 <script lang = "ts">
 	import {createEventDispatcher, onMount} from 'svelte';
 	import type {Task, Priority} from '$stores/taskStore';
+	import Button from '$components/ui/Button.svelte';
+	import Modal from '$components/ui/Modal.svelte';
 	
 	export let show = false;
 	export let editingTask: Task | null = null;
@@ -35,44 +37,42 @@
 	};
 </script>
 
-{#if show}
-	<div class = 'fixed inset-0 z-50 bg-black/30 flex items-center justify-center p-4'>
-		<div class = 'bg-white dark:bg-gray-900 rounded-x1 p-6 w-full max-w-md shadow-lg animat-fadeIn'>
-			<h2 class = 'text-xl font-semibold mb-4'>{editingTask ? 'Edit Task':'Add Task'}
+<Modal bind : show on : close = {close}>
+	<h2 class = 'text-xl font-semibold mb-4'>
+		{editingTask ? 'Edit Task':'Add Task'}
+	</h2>
+	
+	<input
+		bind:value = {description}
+		placeholder = 'Title'
+		class = 'w-full mb-3 p-2 border rounded'
+	/>
+		
+	<textarea
+		bind:value = {description}
+		placeholder = "Description"
+		class = "w-full mb-3 p-2 border rounded"
+	/>
 			
-			<input
-				bind:value = {description}
-				placeholder = 'Title'
-				class = 'w-full mb-3 p-2 border rounded'
-			/>
+	<label class = 'block mb-2 font-medium'>
+		Priority:
+	</label>
 			
-			<textarea
-				bind:value = {description}
-				placeholder = "Description"
-				class = "w-full mb-3 p-2 border rounded"
-			/>
-			
-			<label class = 'block mb-2 font-medium'>
-				Priority:
-			</label>
-			
-			<select bind:value = {priority} class = 'w-full p-2 border rounded mb-4'
-				<option value = "low">Low 🟢</option>
-				<option value = "medium">Medium 🟡</option>
-				<option value = "high">High 🔴</option>
-			</select>
-			
-			<div class = "flex justify-end gap-2">
-				<button on: click = {close} class = 'bg-gray-200 hover:bg-gray-300 text-sm px-4 py-1 rounded'>
-					Cancel
-				</button>
-				<button on: click = {save} class = 'bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-1 rounded'>
-					{editingTask ? 'Update' : 'Add'}
-				</button>
-			</div>
-		</div>
+	<select bind:value = {priority} class = 'w-full p-2 border rounded mb-4'
+		<option value = "low">Low 🟢</option>
+		<option value = "medium">Medium 🟡</option>
+		<option value = "high">High 🔴</option>
+	</select>
+		
+	<div class = "flex justify-end gap-2">
+		<Button type="secondary" on:click={close}>
+			Cancel
+		</Button>
+		<Button type="primary" on:click={save}>
+			{editingTask ? 'Update' : 'Add'}
+		</Button>
 	</div>
-{/if}
+</Modal>
 
 <style>
 	.animate-fadeIn{
