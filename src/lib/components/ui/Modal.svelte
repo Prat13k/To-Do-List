@@ -1,5 +1,5 @@
-<script lang = "ts">
-	import{createEventDispatcher} from 'svelte';
+<script lang="ts">
+	import{ createEventDispatcher } from 'svelte';
 	
 	export let show = false;
 	const dispatch = createEventDispatcher();
@@ -18,15 +18,15 @@
 		>
 			<button
 				class = 'absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-white'
-				on: click = {close}
-				aria-label = 'Close'
+				on:click={close}
+				aria-label='Close'
 			>
 				X
 			</button>
 			<slot/>
 		</div>
 	</div>
-</if>
+{/if}
 
 <style>
 	.animate-fadeIn{

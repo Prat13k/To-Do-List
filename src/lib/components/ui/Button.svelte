@@ -1,7 +1,7 @@
-<script lang = "ts">
-	export let type: 'primary' | 'secondary' | 'danger' = 'primary';
-	export let size: 'sm'|'md'|'lg' = 'mc'
-	export let disabled: boolean = false;
+<script lang="ts">
+	export let type: 'primary' | 'secondary' | 'danger'='primary';
+	export let size: 'sm'|'md'|'lg'='md';
+	export let disabled: boolean=false;
 </script>
 
 <button 
@@ -12,8 +12,8 @@
 		${size === 'sm' && 'text-xs'}
 		${size === 'md' && 'text-sm'}
 		${size === 'lg' && 'text-base'}
-	}
-	disabled = {disabled}
+	`}
+	disabled={disabled}
 >
 	<slot/>
 </button>

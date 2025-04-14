@@ -1,4 +1,4 @@
-<script lang = "ts">
+<script lang="ts">
 	import ThemeToggle from '$components/ThemeToggle.svelte';
 	import LanguageToggle from '$components/LanguageToggle.svelte';
 	import Button from '$components/ui/Button.svelte';

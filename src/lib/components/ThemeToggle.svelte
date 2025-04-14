@@ -1,7 +1,7 @@
-<script lang = "ts">
-	import {onMount} from 'svelte';
-	import {browser} from '$app/enviornment';
-	import {writable} from 'svelte/store';
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { browser } from '$app/environment';
+	import { writable } from 'svelte/store';
 	
 	const themes = ['light', 'dark', 'night'] as const;
 	type Theme  = typeof themes[number];
@@ -17,11 +17,18 @@
 	});
 	
 	function cycleTheme(){
-	
+		themeStore.update((current) => {
+			const index = themes.indexOf(current);
+			const next = themes[(index + 1) % themes.length];
+			updateDOM(next);
+			localStorage.setItem('tusk-theme', next);
+			return next;
+		});
 	}
 	
 	function updateDom(){
-	
+		if (!browser) return;
+		document.documentElement.setAttribute('data-theme', theme);
 	}
 </script>
 

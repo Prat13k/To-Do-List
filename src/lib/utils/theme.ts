@@ -2,7 +2,7 @@ type Theme = 'light' | 'dark' | 'night';
 
 export function setTheme(theme: Theme)
 {
-	document.documentElement.setAttributes('data-Theme',theme);
+	document.documentElement.setAttribute('data-Theme',theme);
 	localStorage.setItem('tusk-theme',theme);
 }
 

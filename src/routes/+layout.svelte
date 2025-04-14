@@ -1,5 +1,7 @@
-<script lang = 'ts'>
+<script lang="ts">
 	export let data;
 </script>
 
-<slot/>
+<main class="min-h-screen bg-bg text-text">
+  <slot />
+</main>

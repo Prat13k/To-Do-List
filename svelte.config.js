@@ -2,9 +2,13 @@ import adapter from '@sveltejs/adapter-auto';
 import preprocess from 'svelte-preprocess';
 import path from 'path';
 
-export default {
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
+  preprocess: preprocess(),
+
   kit: {
     adapter: adapter(),
+
     alias: {
       $lib: path.resolve('./src/lib'),
       $components: path.resolve('./src/lib/components'),
@@ -12,6 +16,7 @@ export default {
       $utils: path.resolve('./src/lib/utils'),
       $styles: path.resolve('./src/lib/styles')
     }
-  },
-  preprocess: preprocess()
+  }
 };
+
+export default config;
