@@ -17,17 +17,19 @@
 		</h3>
 	
 		{#if task.description}
-			<p class = 'text-sm text-gray-600 dark:text-gray-300 mt-1'>
-				{task.description}
-			</p>
+			 <p class="text-sm text-gray-500 dark:text-gray-400">{task.description}</p>
 		{/if}
-		
-		<PriorityTag priority={ task.priority }/>
+		<div class="mt-2 inline-block px-3 py-1 text-xs font-medium rounded-full"
+			class:!bg-red-100={task.priority === 'high'}
+			class:!bg-yellow-100={task.priority === 'medium'}
+			class:!bg-green-100={task.priority === 'low'}
+		>
+			Priority: {task.priority}
+		</div>
+	</div>
 
-	</div>
-	
-	<div class = 'flex flex-col gap-1 items-end ml-4'>
-		<button on:click = { handleEdit } class = 'text-blue-600 hover:text-blue-800 text-sm'>✏️ Edit</button>
-		<button on:click = { handleDelete } class = 'text-blue-600 hover:text-blue-800 text-sm'>🗑️ Delete</button>
-	</div>
+  <div class="flex flex-col gap-1 items-end ml-4">
+    <button on:click={handleEdit} title="Edit" class="text-blue-600 hover:text-blue-800 text-sm">✏️</button>
+    <button on:click={handleDelete} title="Delete" class="text-red-500 hover:text-red-700 text-sm">🗑️</button>
+  </div>
 </div>

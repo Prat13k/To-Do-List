@@ -9,10 +9,10 @@
 	let editingTask: Task | null = null;
 
 	let tasks: Task[] = [];
-	const unsubscribe = taskStore.subscribe((v) => (tasks = v));
+	const unsubscribe = taskStore.subscribe((value) => ($tasks = value));
 
 	onMount(() => {
-		return () => unsubscribe(); // clean up
+		return () => unsubscribe; // clean up
 	});
 
 	function openAddModal() {
@@ -21,7 +21,7 @@
 	}
 
 	function openEditModal(event: CustomEvent<{ id: string }>) {
-		const task = tasks.find((t) => t.id === event.detail.id);
+		const task = $tasks.find((t) => t.id === event.detail.id);
 		if (task) {
 			editingTask = task;
 			showModal = true;
@@ -40,3 +40,32 @@
 		taskStore.editTask(event.detail.id, event.detail);
 	}
 </script>
+
+<main class="p-6 max-w-2xl mx-auto space-y-4">
+  <div class="flex justify-between items-center mb-4">
+    <h1 class="text-2xl font-bold">📝 Tusk</h1>
+    <Button on:click={openAddModal}>＋ Add Task</Button>
+  </div>
+
+  {#if $tasks.length === 0}
+    <p class="text-gray-500">No tasks yet. Start by adding one!</p>
+  {:else}
+    <div class="space-y-3">
+      {#each $tasks as task (task.id)}
+        <TaskCard
+          {task}
+          on:edit={openEditModal}
+          on:delete={handleDelete}
+        />
+      {/each}
+    </div>
+  {/if}
+
+  <AddTaskModal
+    bind:show={showModal}
+    {editingTask}
+    on:create={handleCreate}
+    on:update={handleUpdate}
+    on:close={() => (showModal = false)}
+  />
+</main>

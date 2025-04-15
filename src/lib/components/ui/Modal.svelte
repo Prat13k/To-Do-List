@@ -1,7 +1,7 @@
 <script lang="ts">
 	import{ createEventDispatcher } from 'svelte';
 	
-	export let show = false;
+	export let show = True;
 	const dispatch = createEventDispatcher();
 	
 	function close(){
@@ -33,8 +33,8 @@
 		animation: fadeIn 0.2s ease-out;
 	}
 	
-	@keyframe fadeIn{
-		from {opacity: 0; transfrom: scale(0.95);}
-		to {opacity: 1;transfrom: scale(1);}
+	@keyframes fadeIn{
+		from {opacity: 0; transform: scale(0.95);}
+		to {opacity: 1;transform: scale(1);}
 	}
 </style>

@@ -51,18 +51,19 @@
     class='w-full mb-3 p-2 border rounded'
   />
 
-  <textarea
+  <textarea>
     bind:value={description}
     placeholder="description"
-    class="w-full mb-3 p-2 border rounded"
-  />
+    class="w-full mb-3 p-2 border rounded">
+  </textarea>
 
   <label 
+	for="priority-select"
 	class="block mb-2 font-medium">
     Priority:
   </label>
 
-  <select bind:value={priority} class="w-full p-2 border rounded mb-4">
+  <select id = "priority-select "bind:value={priority} class="w-full p-2 border rounded mb-4">
     <option value="low">Low 🟢</option>
     <option value="medium">Medium 🟡</option>
     <option value="high">High 🔴</option>
@@ -79,10 +80,6 @@
 </Modal>
 
 <style>
-  .animate-fadeIn{
-    animation:fadeIn 0.2s ease-out;
-  }
-
   @keyframes fadeIn {
     from {
       opacity: 0;

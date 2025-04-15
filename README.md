@@ -1,38 +1,38 @@
-# sv
+# 🐘 Tusk — The Minimalist Task Manager
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+Tusk is a beautiful, cross-platform to-do list built with ❤️ using **SvelteKit**, **TailwindCSS**, and **localStorage-first architecture**.
 
-## Creating a project
+> Designed with a philosophy of **Indian elegance + Japanese minimalism**  
+> Tusk is more than a task manager — it's a calm space to organize your day.
 
-If you're seeing this, you've probably already done this step. Congrats!
+---
+
+## ✨ Features
+
+- ✅ Add, edit, and delete tasks
+- 🔁 Priority tagging (low / medium / high)
+- 🎨 Dark, Light & Night modes
+- 🌐 Language toggle (English & Español)
+- 🧠 Offline-first (localStorage powered)
+- 💻 Blazing fast & lightweight
+- 🔐 No login required
+
+---
+
+## 📦 Tech Stack
+
+- [SvelteKit](https://kit.svelte.dev)
+- [TailwindCSS](https://tailwindcss.com)
+- [TypeScript](https://www.typescriptlang.org/)
+- [Paraglide](https://inlang.com/documentation/paraglide-js) for i18n
+- [Vitest](https://vitest.dev) + [Playwright](https://playwright.dev) for testing
+
+---
+
+## 🚀 Getting Started
+
+### 1. Clone the repo
 
 ```bash
-# create a new project in the current directory
-npx sv create
-
-# create a new project in my-app
-npx sv create my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
+git clone https://github.com/your-username/tusk.git
+cd tusk

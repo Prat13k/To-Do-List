@@ -2,8 +2,9 @@
 	import ThemeToggle from '$components/ThemeToggle.svelte';
 	import LanguageToggle from '$components/LanguageToggle.svelte';
 	import Button from '$components/ui/Button.svelte';
-	import {taskStore} from '$stores/taskStore';
+	import { taskStore } from '$stores/taskStore';
 	
+	$: tasks = taskStore;
 	const clearAllTasks = () => {
 		if(confirm("Are you sure you want to clear all tasks ?"))
 		{
@@ -31,7 +32,7 @@
 		</div>
 		<div class = 'border-t border-gray-300 dark:border-gray-700 pt-4'>
 			<Button type = 'danger' on:click = {clearAllTasks}>
-				Clear All
+				Clear All Tasks
 			</Button>
 		</div>
 	</div>

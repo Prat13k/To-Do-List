@@ -26,7 +26,7 @@
 		});
 	}
 	
-	function updateDom(){
+	function updateDom(theme: Theme){
 		if (!browser) return;
 		document.documentElement.setAttribute('data-theme', theme);
 	}

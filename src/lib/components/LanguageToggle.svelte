@@ -14,7 +14,7 @@
 		const saved=localStorage.getItem('lang');
 		
 		if(saved && availableLocales.includes(saved)){
-			changeLocale(saved)
+			changeLocale(saved);
 		} 
 	});
 </script>
