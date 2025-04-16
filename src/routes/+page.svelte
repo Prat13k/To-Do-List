@@ -4,6 +4,7 @@
 	import TaskCard from '$components/TaskCard.svelte';
 	import AddTaskModal from '$components/AddTaskModal.svelte';
 	import Button from '$components/ui/Button.svelte';
+	import { browser} from '$app/environment';
 
 	let showModal = false;
 	let editingTask: Task | null = null;

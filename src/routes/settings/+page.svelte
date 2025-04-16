@@ -3,6 +3,7 @@
 	import LanguageToggle from '$components/LanguageToggle.svelte';
 	import Button from '$components/ui/Button.svelte';
 	import { taskStore } from '$stores/taskStore';
+	import { browser} from '$app/environment';
 	
 	$: tasks = taskStore;
 	const clearAllTasks = () => {
