@@ -28,11 +28,3 @@ Tusk is a beautiful, cross-platform to-do list built with ❤️ using **SvelteK
 - [Vitest](https://vitest.dev) + [Playwright](https://playwright.dev) for testing
 
 ---
-
-## 🚀 Getting Started
-
-### 1. Clone the repo
-
-```bash
-git clone https://github.com/your-username/tusk.git
-cd tusk
