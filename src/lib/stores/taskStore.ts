@@ -1,7 +1,6 @@
 import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import { v4 as uuid } from 'uuid';
-import { writable } from 'svelte/store';
 
 export type Priority = 'low' | 'medium' | 'high';
 
