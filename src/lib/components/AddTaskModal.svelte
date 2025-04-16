@@ -1,10 +1,10 @@
 <script lang="ts">
   import { createEventDispatcher, onMount } from 'svelte';
-  import type { Task, Priority } from '$stores/taskStore';
+  import { taskStore, type Task,Priority } from '$stores/taskStore';
   import Button from '$components/ui/Button.svelte';
   import Modal from '$components/ui/Modal.svelte';
 
-  export let show = false;
+  export let show: boolean = True;
   export let editingTask: Task | null = null;
 
   const dispatch = createEventDispatcher();

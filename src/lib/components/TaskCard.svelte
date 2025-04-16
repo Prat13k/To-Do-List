@@ -1,13 +1,13 @@
 <script lang="ts">
-	import type { Task } from '$stores/taskStore';
+	import { taskStore, type Task } from '$stores/taskStore';
 	import { createEventDispatcher } from 'svelte';
 	import PriorityTag from '$components/PriorityTag.svelte';
 	
 	export let task: Task;
-	const dispatch = createEventDispatcher();
 	
-	const handleEdit = () => dispatch('edit', {id: task.id});
-	const handleDelete = () => dispatch('delete', {id: task.id});
+	const dispatch = createEventDispatcher();
+	const handleEdit = () => dispatch('edit', { id: task.id });
+	const handleDelete = () => dispatch('delete', { id: task.id });
 </script>
 
 <div class = "bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-4 shadow-sm flex justify-between items-start transition-all hover:shadow-md">
