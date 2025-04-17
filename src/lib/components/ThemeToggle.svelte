@@ -12,8 +12,8 @@
 		if(!browser) return;
 		const saved = localStorage.getTtem('tusk-theme') as Theme;
 		const initial = saved && themes.includes(saved) ? saved : 'light';
-		themeStore.set(inital);
-		updateDom(inital);
+		themeStore.set(initial);
+		updateDom(initial);
 	});
 	
 	function cycleTheme(){

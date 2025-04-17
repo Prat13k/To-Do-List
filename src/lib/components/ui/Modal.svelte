@@ -1,7 +1,7 @@
 <script lang="ts">
 	import{ createEventDispatcher } from 'svelte';
 	
-	export let show = True;
+	export let show = true;
 	const dispatch = createEventDispatcher();
 	
 	function close(){
@@ -35,6 +35,6 @@
 	
 	@keyframes fadeIn{
 		from {opacity: 0; transform: scale(0.95);}
-		to {opacity: 1;transform: scale(1);}
+		to {opacity: 1; transform: scale(1);}
 	}
 </style>

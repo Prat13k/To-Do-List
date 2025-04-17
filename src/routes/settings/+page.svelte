@@ -4,8 +4,10 @@
 	import Button from '$components/ui/Button.svelte';
 	import { taskStore } from '$stores/taskStore';
 	import { browser} from '$app/environment';
+	import { Task } from '$stores/taskStore';
 	
-	$: tasks = taskStore;
+	let task: Task[] = [];
+	
 	const clearAllTasks = () => {
 		if(confirm("Are you sure you want to clear all tasks ?"))
 		{
