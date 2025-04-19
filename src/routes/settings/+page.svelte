@@ -4,7 +4,7 @@
 	import Button from '$components/ui/Button.svelte';
 	import { taskStore } from '$stores/taskStore';
 	import { browser} from '$app/environment';
-	import { Task } from '$stores/taskStore';
+	import type { Task } from '$stores/taskStore';
 	
 	let task: Task[] = [];
 	

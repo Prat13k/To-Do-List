@@ -4,7 +4,8 @@
 	export let disabled: boolean = false;
 </script>
 
-<button 
+<button
+	type = "button"
 	class = " rounded font-medium transition px-4 py-1 "
 	class:bg-blue-600 = {type === 'primary'}
 	class:text-white = {type === 'primary' || type === "danger"}

@@ -47,16 +47,22 @@
 
 <main class="p-6 max-w-2xl mx-auto space-y-4">
 	<div class="flex justify-between items-center mb-4">
-		<h1 class="text-2xl font-bold">📝 Tusk</h1>
+		<h1 class="text-2xl font-bold">
+			📝 Tusk
+		</h1>
 		<Button on:click={openAddModal}>＋ Add Task</Button>
 	</div>
 
-	{#if $taskStore.length === 0}
-		<p class="text-gray-500">No tasks yet. Start by adding one!</p>
+	{#if tasks.length === 0}
+		<p class="text-gray-500">
+			No tasks yet. Start by adding one!
+		</p>
 	{:else}
 		<div class="space-y-3">
-			{#each $taskStore as task (task.id)}
-				<TaskCard {task} on:edit={openEditModal} on:delete={handleDelete}/>
+			{#each tasks as task (task.id)}
+				<TaskCard {task} 
+					on:edit={ openEditModal } 
+					on:delete={ handleDelete }/>
 			{/each}
 		</div>
 	{/if}

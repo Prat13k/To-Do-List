@@ -10,10 +10,10 @@
 	
 	onMount(() => {
 		if(!browser) return;
-		const saved = localStorage.getTtem('tusk-theme') as Theme;
+		const saved = localStorage.getItem('tusk-theme') as Theme;
 		const initial = saved && themes.includes(saved) ? saved : 'light';
 		themeStore.set(initial);
-		updateDom(initial);
+		updateDOM(initial);
 	});
 	
 	function cycleTheme(){
@@ -26,7 +26,7 @@
 		});
 	}
 	
-	function updateDom(theme: Theme){
+	function updateDOM(theme: Theme){
 		if (!browser) return;
 		document.documentElement.setAttribute('data-theme', theme);
 	}

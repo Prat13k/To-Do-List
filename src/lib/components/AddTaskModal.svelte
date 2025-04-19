@@ -63,7 +63,7 @@
 		Priority: {priority}
 	</label>
 
-	<select id = "priority-select "bind:value={priority} class="w-full p-2 border rounded mb-4">
+	<select id = "priority-select" bind:value={priority} class="w-full p-2 border rounded mb-4">
 		<option value="low">Low 🟢</option>
 		<option value="medium">Medium 🟡</option>
 		<option value="high">High 🔴</option>

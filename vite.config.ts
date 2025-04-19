@@ -1,9 +1,12 @@
 import { defineConfig } from 'vite';
 import { sveltekit } from '@sveltejs/kit/vite';
 import path from 'path';
+import preprocess from 'svelte-preprocess';
 
 export default defineConfig({
-	plugins: [sveltekit()],
+	plugins: [sveltekit({
+		preprocess: preprocess()
+	})],
 	resolve: {
 		alias: {
 			$lib: path.resolve('./src/lib'),
