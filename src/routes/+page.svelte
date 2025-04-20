@@ -1,77 +1,902 @@
-<script lang="ts">
-	import { onMount } from 'svelte';
-	import { taskStore, type Task } from '$stores/taskStore';
-	import TaskCard from '$components/TaskCard.svelte';
-	import AddTaskModal from '$components/AddTaskModal.svelte';
-	import Button from '$components/ui/Button.svelte';
-	import { browser} from '$app/environment';
-	import { get } from 'svelte/store';
-
-	let showModal = false;
-	let editingTask: Task | null = null;
-	let tasks: Task[] = [];
-
-	onMount(() => {
-		const unsubscribe = taskStore.subscribe((value) => {tasks = value;})
-		return unsubscribe;
-	});
-
-	function openAddModal() {
-		editingTask = null;
-		showModal = true;
-	}
-
-	function openEditModal(event: CustomEvent<{ id: string }>) {	
-		const id = event.detail.id;
-		const allTasks = get(taskStore);
-		const task = allTasks.find(t => t.id === id);
-		
-		if (task) {
-			editingTask = task;
-			showModal = true;
-		}
-	}
-
-	function handleDelete(event: CustomEvent<{ id: string }>) {
-		taskStore.deleteTask(event.detail.id);
-	}
-
-	function handleCreate(event: CustomEvent<Omit<Task, 'id' | 'createdAt'>>) {
-		taskStore.addTask(event.detail);
-	}
-
-	function handleUpdate(event: CustomEvent<Partial<Task> & { id: string }>) {
-		taskStore.editTask(event.detail.id, event.detail);
-	}
+<!-- src/routes/+page.svelte -->
+<script>
+  import { writable } from 'svelte/store';
+  import { onMount } from 'svelte';
+  
+  const tasks = writable([]);
+  
+  let newTaskTitle = '';
+  let newTaskDescription = '';
+  let newTaskPriority = 'MEDIUM';
+  let showAddTask = false;
+  let darkMode = false;
+  let showCompleted = true;
+  
+  // Delete confirmation
+  let showDeleteConfirmation = false;
+  let taskToDelete = null;
+  
+  // Update body class when dark mode changes
+  $: if (typeof document !== 'undefined') {
+    if (darkMode) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+  }
+  
+  function addTask() {
+    if (newTaskTitle.trim()) {
+      // Find the highest ID and add 1
+      const highestId = $tasks.length > 0 
+        ? Math.max(...$tasks.map(t => t.id)) 
+        : 0;
+      
+      const newTask = {
+        id: highestId + 1,
+        title: newTaskTitle.trim(),
+        description: newTaskDescription.trim(),
+        priority: newTaskPriority,
+        completed: false
+      };
+      
+      tasks.update(items => [newTask, ...items]);
+      resetForm();
+    }
+  }
+  
+  function resetForm() {
+    newTaskTitle = '';
+    newTaskDescription = '';
+    newTaskPriority = 'MEDIUM';
+    showAddTask = false;
+  }
+  
+  function clearAllTasks() {
+    tasks.set([]);
+  }
+  
+  function confirmDelete(taskId) {
+    taskToDelete = taskId;
+    showDeleteConfirmation = true;
+  }
+  
+  function cancelDelete() {
+    taskToDelete = null;
+    showDeleteConfirmation = false;
+  }
+  
+  function deleteTask() {
+    if (taskToDelete !== null) {
+      tasks.update(items => items.filter(item => item.id !== taskToDelete));
+      showDeleteConfirmation = false;
+      taskToDelete = null;
+    }
+  }
+  
+  function deleteAllCompleted() {
+    tasks.update(items => items.filter(item => !item.completed));
+  }
+  
+  function toggleTaskCompleted(taskId) {
+    tasks.update(items => 
+      items.map(task => 
+        task.id === taskId ? {...task, completed: !task.completed} : task
+      )
+    );
+  }
+  
+  // Initialize dark mode based on user's system preference and load saved tasks
+  onMount(() => {
+    if (typeof window !== 'undefined') {
+      // Set dark mode based on system preference
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      darkMode = prefersDark;
+      
+      // Load tasks from localStorage if available
+      const savedTasks = localStorage.getItem('tusk_tasks');
+      if (savedTasks) {
+        try {
+          tasks.set(JSON.parse(savedTasks));
+        } catch (e) {
+          console.error('Failed to load saved tasks', e);
+        }
+      }
+    }
+  });
+  
+  // Save tasks to localStorage whenever they change
+  $: if (typeof localStorage !== 'undefined') {
+    localStorage.setItem('tusk_tasks', JSON.stringify($tasks));
+  }
+  
+  $: filteredTasks = showCompleted ? $tasks : $tasks.filter(task => !task.completed);
+  $: hasCompletedTasks = $tasks.some(task => task.completed);
 </script>
 
-<main class="p-6 max-w-2xl mx-auto space-y-4">
-	<div class="flex justify-between items-center mb-4">
-		<h1 class="text-2xl font-bold">
-			📝 Tusk
-		</h1>
-		<Button on:click={openAddModal}>＋ Add Task</Button>
-	</div>
+<svelte:head>
+  <title>Tusk - Task Manager</title>
+  <meta name="description" content="Tusk - A simple and elegant task manager">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+</svelte:head>
 
-	{#if tasks.length === 0}
-		<p class="text-gray-500">
-			No tasks yet. Start by adding one!
-		</p>
-	{:else}
-		<div class="space-y-3">
-			{#each tasks as task (task.id)}
-				<TaskCard {task} 
-					on:edit={ openEditModal } 
-					on:delete={ handleDelete }/>
-			{/each}
-		</div>
-	{/if}
+<div class="task-app" class:dark-mode={darkMode}>
+  <header>
+    <div class="app-header">
+      <h1 class="app-title">Tusk</h1>
+      <div class="app-nav">
+        <a href="/" class="nav-link active">Home</a>
+        <a href="/settings" class="nav-link">Settings</a>
+        <button class="theme-toggle" on:click={() => darkMode = !darkMode}>
+          {darkMode ? '☀️' : '🌙'}
+        </button>
+      </div>
+    </div>
 
-	<AddTaskModal
-		bind:show={showModal}
-		{editingTask}
-		on:create={handleCreate}
-		on:update={handleUpdate}
-		on:close={() => (showModal = false)}
-	/>
-</main>
+    <div class="app-controls">
+      <div class="mode-control">
+        <div class="toggle-switch">
+          <label class="switch">
+            <input type="checkbox" bind:checked={showCompleted}>
+            <span class="slider"></span>
+          </label>
+          <span class="toggle-label">Show Completed</span>
+        </div>
+      </div>
+      
+      <div class="action-buttons">
+        {#if hasCompletedTasks}
+          <button class="action-button secondary" on:click={deleteAllCompleted}>
+            Clear Completed
+          </button>
+        {/if}
+        
+        <button class="action-button primary" on:click={() => showAddTask = !showAddTask}>
+          + Add Task
+        </button>
+      </div>
+    </div>
+  </header>
+  
+  {#if showAddTask}
+    <div class="add-task-form">
+      <input
+        type="text"
+        bind:value={newTaskTitle}
+        placeholder="Task title"
+        class="task-input"
+        autofocus
+      />
+      <input
+        type="text"
+        bind:value={newTaskDescription}
+        placeholder="Description (optional)"
+        class="task-input"
+      />
+      <div class="form-row">
+        <div class="priority-selector">
+          <label>Priority:</label>
+          <select bind:value={newTaskPriority}>
+            <option value="LOW">Low</option>
+            <option value="MEDIUM">Medium</option>
+            <option value="HIGH">High</option>
+          </select>
+        </div>
+        <div class="form-buttons">
+          <button class="button secondary" on:click={resetForm}>Cancel</button>
+          <button class="button primary" on:click={addTask} disabled={!newTaskTitle.trim()}>
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  {/if}
+  
+  {#if $tasks.length === 0}
+    <div class="empty-state">
+      <p>No tasks yet. Start by adding one!</p>
+    </div>
+  {/if}
+  
+  <div class="task-list">
+    {#each filteredTasks as task (task.id)}
+      <div class="task-card" class:completed={task.completed}>
+        <div class="task-content">
+          <div class="task-header">
+            <input 
+              type="checkbox" 
+              class="complete-checkbox" 
+              checked={task.completed} 
+              on:change={() => toggleTaskCompleted(task.id)}
+            />
+            <h2>{task.title}</h2>
+          </div>
+          {#if task.description}
+            <p>{task.description}</p>
+          {/if}
+        </div>
+        <div class="task-actions">
+          <div class="task-priority {task.priority.toLowerCase()}">{task.priority}</div>
+          <button class="delete-task" on:click={() => confirmDelete(task.id)} aria-label="Delete task">
+            ×
+          </button>
+        </div>
+      </div>
+    {/each}
+  </div>
+  
+  {#if showDeleteConfirmation}
+    <div class="modal-backdrop" on:click={cancelDelete}>
+      <div class="modal" on:click|stopPropagation>
+        <h3>Confirm Delete</h3>
+        <p>Are you sure you want to delete this task?</p>
+        <div class="modal-buttons">
+          <button class="button secondary" on:click={cancelDelete}>Cancel</button>
+          <button class="button danger" on:click={deleteTask}>Delete</button>
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  <!-- Footer -->
+  <footer>
+    <p>Tusk &copy; {new Date().getFullYear()}</p>
+  </footer>
+</div>
+
+<style>
+  /* Global styles */
+  :global(body) {
+    margin: 0;
+    padding: 0;
+    background-color: #f5f5f5;
+    transition: background-color 0.3s ease;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  }
+  
+  :global(body.dark-mode) {
+    background-color: #121212;
+  }
+  
+  /* App container */
+  .task-app {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    min-height: 100vh;
+    transition: color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .dark-mode {
+    color: #e0e0e0;
+  }
+  
+  /* Header styles */
+  header {
+    margin-bottom: 20px;
+  }
+  
+  .app-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  
+  .dark-mode .app-header {
+    border-bottom-color: #333;
+  }
+  
+  .app-title {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #1a73e8;
+    margin: 0;
+  }
+  
+  .app-nav {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+  }
+  
+  .nav-link {
+    color: #666;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    color: #1a73e8;
+  }
+  
+  .nav-link.active {
+    color: #1a73e8;
+  }
+  
+  .dark-mode .nav-link {
+    color: #aaa;
+  }
+  
+  .dark-mode .nav-link:hover {
+    color: #64b5f6;
+  }
+  
+  .dark-mode .nav-link.active {
+    color: #64b5f6;
+  }
+  
+  .theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 5px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s ease;
+  }
+  
+  .theme-toggle:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .dark-mode .theme-toggle:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* App controls */
+  .app-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+  
+  .mode-control {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .toggle-label {
+    font-size: 0.9rem;
+    color: #666;
+    transition: color 0.3s ease;
+  }
+  
+  .dark-mode .toggle-label {
+    color: #aaa;
+  }
+  
+  /* Switch styling */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+  }
+  
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+  }
+  
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+  }
+  
+  input:checked + .slider {
+    background-color: #1a73e8;
+  }
+  
+  input:focus + .slider {
+    box-shadow: 0 0 1px #1a73e8;
+  }
+  
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
+  
+  /* Action buttons */
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  
+  .action-button {
+    border-radius: 50px;
+    padding: 8px 16px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    border: none;
+  }
+  
+  .action-button.primary {
+    background-color: #1a73e8;
+    color: white;
+  }
+  
+  .action-button.primary:hover {
+    background-color: #1557b0;
+  }
+  
+  .action-button.secondary {
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+  }
+  
+  .dark-mode .action-button.secondary {
+    color: #aaa;
+    border-color: #444;
+  }
+  
+  .action-button.secondary:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .dark-mode .action-button.secondary:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    color: #666;
+    font-size: 1.2rem;
+    margin: 80px 0;
+    transition: color 0.3s ease;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .dark-mode .empty-state {
+    color: #aaa;
+  }
+  
+  /* Task list */
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-grow: 1;
+  }
+  
+  /* Task card */
+  .task-card {
+    background-color: white;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: all 0.3s ease;
+  }
+  
+  .task-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dark-mode .task-card {
+    background-color: #1e1e1e;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .dark-mode .task-card:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  }
+  
+  .task-card.completed {
+    opacity: 0.7;
+  }
+  
+  .task-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+  }
+  
+  .complete-checkbox {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #1a73e8;
+  }
+  
+  .task-content {
+    flex-grow: 1;
+    margin-right: 10px;
+  }
+  
+  .task-content h2 {
+    font-size: 1.1rem;
+    margin: 0;
+    color: #333;
+    transition: color 0.3s ease, text-decoration 0.3s ease;
+    font-weight: 500;
+  }
+  
+  .dark-mode .task-content h2 {
+    color: #e0e0e0;
+  }
+  
+  .task-card.completed h2 {
+    text-decoration: line-through;
+    color: #888;
+  }
+  
+  .task-content p {
+    margin: 5px 0 0 28px;
+    color: #666;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+  }
+  
+  .dark-mode .task-content p {
+    color: #aaa;
+  }
+  
+  /* Task actions */
+  .task-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+  
+  .task-priority {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: lowercase;
+  }
+  
+  .task-priority.low {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+  }
+  
+  .task-priority.medium {
+    background-color: #fff8e1;
+    color: #ff8f00;
+  }
+  
+  .task-priority.high {
+    background-color: #ffebee;
+    color: #c62828;
+  }
+  
+  .dark-mode .task-priority.low {
+    background-color: rgba(46, 125, 50, 0.2);
+    color: #81c784;
+  }
+  
+  .dark-mode .task-priority.medium {
+    background-color: rgba(255, 143, 0, 0.2);
+    color: #ffb74d;
+  }
+  
+  .dark-mode .task-priority.high {
+    background-color: rgba(198, 40, 40, 0.2);
+    color: #e57373;
+  }
+  
+  .delete-task {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #999;
+    line-height: 1;
+    padding: 0 5px;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .delete-task:hover {
+    color: #d32f2f;
+  }
+  
+  /* Add task form */
+  .add-task-form {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+  
+  .dark-mode .add-task-form {
+    background-color: #1e1e1e;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .task-input {
+    width: 100%;
+    padding: 10px 12px;
+    margin-bottom: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    background-color: white;
+    color: #333;
+    transition: all 0.3s ease;
+    box-sizing: border-box;
+  }
+  
+  .task-input:focus {
+    border-color: #1a73e8;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  }
+  
+  .dark-mode .task-input {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #444;
+  }
+  
+  .dark-mode .task-input:focus {
+    border-color: #64b5f6;
+    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+  }
+  
+  .form-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .priority-selector {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .priority-selector label {
+    color: #666;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+  }
+  
+  .dark-mode .priority-selector label {
+    color: #aaa;
+  }
+  
+  .priority-selector select {
+    padding: 8px;
+    border-radius: 6px;
+    border: 1px solid #ddd;
+    background-color: white;
+    color: #333;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+  }
+  
+  .priority-selector select:focus {
+    border-color: #1a73e8;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.2);
+  }
+  
+  .dark-mode .priority-selector select {
+    background-color: #333;
+    color: #e0e0e0;
+    border-color: #444;
+  }
+  
+  .dark-mode .priority-selector select:focus {
+    border-color: #64b5f6;
+    box-shadow: 0 0 0 2px rgba(100, 181, 246, 0.2);
+  }
+  
+  .form-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  /* Generic button styles */
+  .button {
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+  }
+  
+  .button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+  
+  .button.primary {
+    background-color: #1a73e8;
+    color: white;
+    border: none;
+  }
+  
+  .button.primary:hover:not(:disabled) {
+    background-color: #1557b0;
+  }
+  
+  .button.secondary {
+    background-color: transparent;
+    color: #666;
+    border: 1px solid #ddd;
+  }
+  
+  .button.secondary:hover:not(:disabled) {
+    background-color: rgba(0, 0, 0, 0.05);
+  }
+  
+  .dark-mode .button.secondary {
+    color: #aaa;
+    border-color: #444;
+  }
+  
+  .dark-mode .button.secondary:hover:not(:disabled) {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+  
+  .button.danger {
+    background-color: #d32f2f;
+    color: white;
+    border: none;
+  }
+  
+  .button.danger:hover:not(:disabled) {
+    background-color: #b71c1c;
+  }
+  
+  /* Modal styles */
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(3px);
+  }
+  
+  .modal {
+    background-color: white;
+    border-radius: 12px;
+    padding: 24px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    transition: all 0.3s ease;
+  }
+  
+  .dark-mode .modal {
+    background-color: #1e1e1e;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+  
+  .modal h3 {
+    margin-top: 0;
+    margin-bottom: 16px;
+    color: #333;
+    font-size: 1.3rem;
+    transition: color 0.3s ease;
+  }
+  
+  .dark-mode .modal h3 {
+    color: #e0e0e0;
+  }
+  
+  .modal p {
+    margin-bottom: 24px;
+    color: #666;
+    font-size: 1rem;
+    transition: color 0.3s ease;
+  }
+  
+  .dark-mode .modal p {
+    color: #aaa;
+  }
+  
+  .modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+
+  /* Footer */
+  footer {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #e0e0e0;
+    color: #999;
+    font-size: 0.8rem;
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+  
+  .dark-mode footer {
+    border-top-color: #333;
+    color: #777;
+  }
+  
+  /* Responsive design */
+  @media (max-width: 600px) {
+    .app-controls {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    
+    .action-buttons {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
+    .form-row {
+      flex-direction: column;
+      align-items: stretch;
+    }
+    
+    .priority-selector {
+      margin-bottom: 15px;
+    }
+    
+    .form-buttons {
+      justify-content: space-between;
+    }
+  }
+</style>

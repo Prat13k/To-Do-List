@@ -40,7 +40,7 @@
 	};
 </script>
 
-<Modal bind:show on:close={close}>
+<Modal bind:show={show} on:close={close}>
 	<h2 class='text-xl font-semibold mb-4'>
 		{editingTask ? 'Edit Task' : 'Add Task'}
 	</h2>

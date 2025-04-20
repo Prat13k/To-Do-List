@@ -13,35 +13,27 @@ export type Task = {
 	updatedAt?: string;
 };
 
-function createTaskStore() 
-{
+function createTaskStore() {
 	const KEY = 'tusk-tasks';
 
-	const load = (): Task[] => 
-	{
+	const load = (): Task[] => {
 		if (!browser) return [];
-		try 
-		{
+		try {
 			const stored = localStorage.getItem(KEY);
 			return stored ? JSON.parse(stored) : [];
 		} 
-		catch (error) 
-		{
+		catch (error) {
 			console.error('Error loading tasks from localStorage:', error);
 			return [];
 		}
 	};
 
-	const save = (tasks: Task[]) => 
-	{
-		if (browser) 
-		{
-			try 
-			{
+	const save = (tasks: Task[]) => {
+		if (browser) {
+			try {
 				localStorage.setItem(KEY, JSON.stringify(tasks));
 			} 
-			catch (error) 
-			{
+			catch (error) {
 				console.error('Error saving tasks to localStorage:', error);
 			}
 		}
@@ -49,12 +41,9 @@ function createTaskStore()
 
 	const { subscribe, update, set } = writable<Task[]>(load());
 
-	const addTask = (task:Omit<Task, 'id' | 'createdAt'>) => 
-	{
-		update((tasks) => 
-		{
-			const newTask: Task = 
-			{
+	const addTask = (task:Omit<Task, 'id' | 'createdAt'>) => {
+		update((tasks) => {
+			const newTask: Task = {
 				...task,
 				id: uuid(),
 				createdAt: new Date().toISOString()
@@ -65,40 +54,34 @@ function createTaskStore()
 		});
 	};
 
-	const editTask = (id: string, updatedFields: Partial<Task>) => 
-	{
-		update((tasks) => 
-		{
+	const editTask = (id:string, updatedFields:Partial<Task>) => {
+		update((tasks) => {
 			const updated = tasks.map((task) => task.id === id ? { ...task, ...updatedFields, updatedAt: new Date().toISOString()}: task);
 			save(updated);
 			return updated;
 		});
 	};
 
-	const deleteTask = (id: string) => 
-	{
-		update((tasks) => 
-		{
+	const deleteTask = (id: string) => {
+		update((tasks) => {
 			const updated = tasks.filter((task) => task.id !== id);
 			save(updated);
 			return updated;
 		});
 	};
 
-	const clearAll = () => 
-	{
+	const clearAll = () => {
 		set([]);
 		save([]);
 	};
 
-	const reset = () => 
-	{
+	const reset = () => {
 		const starter: Task[] = [];
 		set(starter);
 		save(starter);
 	};
 
-	return {
+	return ({
 		load,
 		save,
 		subscribe,
@@ -107,7 +90,7 @@ function createTaskStore()
 		deleteTask,
 		clearAll,
 		reset
-	};
+	});
 }
 
 export const taskStore = createTaskStore();
