@@ -11,6 +11,7 @@
   let showAddTask = false;
   let darkMode = false;
   let showCompleted = true;
+  let showSettings = false; // Add this to control settings view
   
   // Delete confirmation
   let showDeleteConfirmation = false;
@@ -22,6 +23,22 @@
       document.body.classList.add('dark-mode');
     } else {
       document.body.classList.remove('dark-mode');
+    }
+  }
+  
+  function toggleDarkMode() {
+    darkMode = !darkMode;
+    // Save preference to localStorage
+    if (typeof localStorage !== 'undefined') {
+      localStorage.setItem('dark_mode', JSON.stringify(darkMode));
+    }
+  }
+  
+  function toggleSettings() {
+    showSettings = !showSettings;
+    // Hide add task form when settings are shown
+    if (showSettings) {
+      showAddTask = false;
     }
   }
   
@@ -89,9 +106,20 @@
   // Initialize dark mode based on user's system preference and load saved tasks
   onMount(() => {
     if (typeof window !== 'undefined') {
-      // Set dark mode based on system preference
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      darkMode = prefersDark;
+      // Try to load dark mode preference first
+      const savedDarkMode = localStorage.getItem('dark_mode');
+      if (savedDarkMode !== null) {
+        try {
+          darkMode = JSON.parse(savedDarkMode);
+        } catch (e) {
+          console.error('Failed to load dark mode preference', e);
+          // Fallback to system preference
+          darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        }
+      } else {
+        // Set dark mode based on system preference if no saved preference
+        darkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      }
       
       // Load tasks from localStorage if available
       const savedTasks = localStorage.getItem('tusk_tasks');
@@ -115,115 +143,157 @@
 </script>
 
 <svelte:head>
-  <title>Tusk - Task Manager</title>
-  <meta name="description" content="Tusk - A simple and elegant task manager">
+  <title>Zotu - The To do list</title>
+  <meta name="description" content="Zotu - A simple and elegant task manager">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 </svelte:head>
 
-<div class="task-app" class:dark-mode={darkMode}>
+<!-- Fixed dark mode by ensuring the class binding is correctly placed -->
+<div class="task-app {darkMode ? 'dark-mode' : ''}">
   <header>
     <div class="app-header">
-      <h1 class="app-title">Tusk</h1>
+      <h1 class="app-title">Zotu</h1>
       <div class="app-nav">
-        <a href="/" class="nav-link active">Home</a>
-        <a href="/settings" class="nav-link">Settings</a>
-        <button class="theme-toggle" on:click={() => darkMode = !darkMode}>
+        <!-- Use buttons instead of links for SPA navigation -->
+        <button 
+          class="nav-link {!showSettings ? 'active' : ''}" 
+          on:click={() => showSettings = false}
+        >
+          Home
+        </button>
+        <button 
+          class="nav-link {showSettings ? 'active' : ''}" 
+          on:click={toggleSettings}
+        >
+          Settings
+        </button>
+        <button class="theme-toggle" on:click={toggleDarkMode}>
           {darkMode ? '☀️' : '🌙'}
         </button>
       </div>
     </div>
 
-    <div class="app-controls">
-      <div class="mode-control">
-        <div class="toggle-switch">
-          <label class="switch">
-            <input type="checkbox" bind:checked={showCompleted}>
-            <span class="slider"></span>
-          </label>
-          <span class="toggle-label">Show Completed</span>
+    {#if !showSettings}
+      <div class="app-controls">
+        <div class="mode-control">
+          <div class="toggle-switch">
+            <label class="switch">
+              <input type="checkbox" bind:checked={showCompleted}>
+              <span class="slider"></span>
+            </label>
+            <span class="toggle-label">Show Completed</span>
+          </div>
+        </div>
+        
+        <div class="action-buttons">
+          {#if hasCompletedTasks}
+            <button class="action-button secondary" on:click={deleteAllCompleted}>
+              Clear Completed
+            </button>
+          {/if}
+          
+          <button class="action-button primary" on:click={() => showAddTask = !showAddTask}>
+            + Add Task
+          </button>
+        </div>
+      </div>
+    {/if}
+  </header>
+  
+  {#if showSettings}
+    <div class="settings-container">
+      <h2>Settings</h2>
+      
+      <div class="settings-section">
+        <h3>Appearance</h3>
+        <div class="setting-item">
+          <span>Dark Mode</span>
+          <div class="toggle-switch">
+            <label class="switch">
+              <input type="checkbox" bind:checked={darkMode}>
+              <span class="slider"></span>
+            </label>
+          </div>
         </div>
       </div>
       
-      <div class="action-buttons">
-        {#if hasCompletedTasks}
-          <button class="action-button secondary" on:click={deleteAllCompleted}>
-            Clear Completed
-          </button>
-        {/if}
-        
-        <button class="action-button primary" on:click={() => showAddTask = !showAddTask}>
-          + Add Task
-        </button>
-      </div>
-    </div>
-  </header>
-  
-  {#if showAddTask}
-    <div class="add-task-form">
-      <input
-        type="text"
-        bind:value={newTaskTitle}
-        placeholder="Task title"
-        class="task-input"
-        autofocus
-      />
-      <input
-        type="text"
-        bind:value={newTaskDescription}
-        placeholder="Description (optional)"
-        class="task-input"
-      />
-      <div class="form-row">
-        <div class="priority-selector">
-          <label>Priority:</label>
-          <select bind:value={newTaskPriority}>
-            <option value="LOW">Low</option>
-            <option value="MEDIUM">Medium</option>
-            <option value="HIGH">High</option>
-          </select>
-        </div>
-        <div class="form-buttons">
-          <button class="button secondary" on:click={resetForm}>Cancel</button>
-          <button class="button primary" on:click={addTask} disabled={!newTaskTitle.trim()}>
-            Save
+      <div class="settings-section">
+        <h3>Data Management</h3>
+        <div class="setting-actions">
+          <button class="button danger" on:click={clearAllTasks}>
+            Clear All Tasks
           </button>
         </div>
       </div>
     </div>
-  {/if}
-  
-  {#if $tasks.length === 0}
-    <div class="empty-state">
-      <p>No tasks yet. Start by adding one!</p>
-    </div>
-  {/if}
-  
-  <div class="task-list">
-    {#each filteredTasks as task (task.id)}
-      <div class="task-card" class:completed={task.completed}>
-        <div class="task-content">
-          <div class="task-header">
-            <input 
-              type="checkbox" 
-              class="complete-checkbox" 
-              checked={task.completed} 
-              on:change={() => toggleTaskCompleted(task.id)}
-            />
-            <h2>{task.title}</h2>
+  {:else}
+    {#if showAddTask}
+      <div class="add-task-form">
+        <input
+          type="text"
+          bind:value={newTaskTitle}
+          placeholder="Task title"
+          class="task-input"
+          autofocus
+        />
+        <input
+          type="text"
+          bind:value={newTaskDescription}
+          placeholder="Description (optional)"
+          class="task-input"
+        />
+        <div class="form-row">
+          <div class="priority-selector">
+            <label>Priority:</label>
+            <select bind:value={newTaskPriority}>
+              <option value="LOW">Low</option>
+              <option value="MEDIUM">Medium</option>
+              <option value="HIGH">High</option>
+            </select>
           </div>
-          {#if task.description}
-            <p>{task.description}</p>
-          {/if}
-        </div>
-        <div class="task-actions">
-          <div class="task-priority {task.priority.toLowerCase()}">{task.priority}</div>
-          <button class="delete-task" on:click={() => confirmDelete(task.id)} aria-label="Delete task">
-            ×
-          </button>
+          <div class="form-buttons">
+            <button class="button secondary" on:click={resetForm}>Cancel</button>
+            <button class="button primary" on:click={addTask} disabled={!newTaskTitle.trim()}>
+              Save
+            </button>
+          </div>
         </div>
       </div>
-    {/each}
-  </div>
+    {/if}
+    
+    {#if $tasks.length === 0}
+      <div class="empty-state">
+        <p>No tasks yet. Start by adding one!</p>
+      </div>
+    {/if}
+    
+    <div class="task-list">
+      {#each filteredTasks as task (task.id)}
+        <div class="task-card" class:completed={task.completed}>
+          <div class="task-content">
+            <div class="task-header">
+              <input 
+                type="checkbox" 
+                class="complete-checkbox" 
+                checked={task.completed} 
+                on:change={() => toggleTaskCompleted(task.id)}
+              />
+              <h2>{task.title}</h2>
+            </div>
+            {#if task.description}
+              <p>{task.description}</p>
+            {/if}
+          </div>
+          <div class="task-actions">
+            <div class="task-priority {task.priority.toLowerCase()}">{task.priority}</div>
+            <button class="delete-task" on:click={() => confirmDelete(task.id)} aria-label="Delete task">
+              ×
+            </button>
+          </div>
+        </div>
+      {/each}
+    </div>
+  {/if}
   
   {#if showDeleteConfirmation}
     <div class="modal-backdrop" on:click={cancelDelete}>
@@ -240,7 +310,7 @@
 
   <!-- Footer -->
   <footer>
-    <p>Tusk &copy; {new Date().getFullYear()}</p>
+    <p>Zotu &copy; {new Date().getFullYear()}</p>
   </footer>
 </div>
 
@@ -256,6 +326,7 @@
   
   :global(body.dark-mode) {
     background-color: #121212;
+    color: #e0e0e0;
   }
   
   /* App container */
@@ -264,13 +335,30 @@
     margin: 0 auto;
     padding: 20px;
     min-height: 100vh;
-    transition: color 0.3s ease;
+    transition: color 0.3s ease, background-color 0.3s ease;
     display: flex;
     flex-direction: column;
+    color: #333;
+    background-color: #f5f5f5;
   }
   
-  .dark-mode {
+  .task-app.dark-mode {
     color: #e0e0e0;
+    background-color: #121212;
+  }
+  
+  /* Footer styles */
+  footer {
+    margin-top: auto;
+    padding-top: 20px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #666;
+    transition: color 0.3s ease;
+  }
+  
+  .dark-mode footer {
+    color: #aaa;
   }
   
   /* Header styles */
@@ -308,15 +396,22 @@
     color: #666;
     text-decoration: none;
     font-weight: 500;
-    transition: color 0.3s ease;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
   }
   
   .nav-link:hover {
     color: #1a73e8;
+    background-color: rgba(26, 115, 232, 0.05);
   }
   
   .nav-link.active {
     color: #1a73e8;
+    background-color: rgba(26, 115, 232, 0.1);
   }
   
   .dark-mode .nav-link {
@@ -325,10 +420,12 @@
   
   .dark-mode .nav-link:hover {
     color: #64b5f6;
+    background-color: rgba(100, 181, 246, 0.1);
   }
   
   .dark-mode .nav-link.active {
     color: #64b5f6;
+    background-color: rgba(100, 181, 246, 0.15);
   }
   
   .theme-toggle {
@@ -336,7 +433,7 @@
     border: none;
     cursor: pointer;
     font-size: 1.2rem;
-    padding: 5px;
+    padding: 8px;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -350,6 +447,66 @@
   
   .dark-mode .theme-toggle:hover {
     background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  /* Settings styles */
+  .settings-container {
+    background-color: white;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    flex-grow: 1;
+  }
+  
+  .dark-mode .settings-container {
+    background-color: #1e1e1e;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  }
+  
+  .settings-container h2 {
+    font-size: 1.5rem;
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #333;
+    transition: color 0.3s ease;
+  }
+  
+  .dark-mode .settings-container h2 {
+    color: #e0e0e0;
+  }
+  
+  .settings-section {
+    margin-bottom: 25px;
+  }
+  
+  .settings-section h3 {
+    font-size: 1.1rem;
+    color: #666;
+    margin-bottom: 15px;
+    transition: color 0.3s ease;
+  }
+  
+  .dark-mode .settings-section h3 {
+    color: #aaa;
+  }
+  
+  .setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #eee;
+    transition: border-color 0.3s ease;
+  }
+  
+  .dark-mode .setting-item {
+    border-bottom-color: #333;
+  }
+  
+  .setting-actions {
+    margin-top: 15px;
   }
   
   /* App controls */
@@ -852,30 +1009,29 @@
     color: #aaa;
   }
   
+  .dark-mode .modal p {
+    color: #aaa;
+  }
+  
   .modal-buttons {
     display: flex;
     justify-content: flex-end;
-    gap: 12px;
-  }
-
-  /* Footer */
-  footer {
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 1px solid #e0e0e0;
-    color: #999;
-    font-size: 0.8rem;
-    text-align: center;
-    transition: all 0.3s ease;
+    gap: 10px;
   }
   
-  .dark-mode footer {
-    border-top-color: #333;
-    color: #777;
-  }
-  
-  /* Responsive design */
+  /* Responsive styles */
   @media (max-width: 600px) {
+    .app-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+    
+    .app-nav {
+      width: 100%;
+      justify-content: space-between;
+    }
+    
     .app-controls {
       flex-direction: column;
       align-items: flex-start;
@@ -888,15 +1044,18 @@
     
     .form-row {
       flex-direction: column;
-      align-items: stretch;
-    }
-    
-    .priority-selector {
-      margin-bottom: 15px;
+      align-items: flex-start;
     }
     
     .form-buttons {
+      width: 100%;
       justify-content: space-between;
     }
+    
+    .task-actions {
+      flex-direction: column;
+      align-items: flex-end;
+    }
   }
+  
 </style>

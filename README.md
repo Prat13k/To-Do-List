@@ -1,6 +1,6 @@
-# 🐘 Tusk — The Minimalist Task Manager
+# 🐘 Zotu — The Minimalist Task Manager
 
-Tusk is a beautiful, cross-platform to-do list built with ❤️ using **SvelteKit**, **TailwindCSS**, and **localStorage-first architecture**.
+Zotu is a beautiful, cross-platform to-do list built with ❤️ using **SvelteKit**, **TailwindCSS**, and **localStorage-first architecture**.
 
 > Designed with a philosophy of **Indian elegance + Japanese minimalism**  
 > Tusk is more than a task manager — it's a calm space to organize your day.
