@@ -7,13 +7,15 @@
 		"build": "vite build",
 		"preview": "vite preview",
 		"test": "vitest",
-		"test:e2e": "playwright test"
+		"test:e2e": "playwright test",
+		"tauri": "tauri dev"
 	},
 	"devDependencies": {
 		"@playwright/test": "^1.51.1",
 		"@sveltejs/adapter-auto": "^6.0.0",
 		"@sveltejs/kit": "^2.20.7",
 		"@sveltejs/vite-plugin-svelte": "^5.0.3",
+		"@tauri-apps/cli": "^2.5.0",
 		"autoprefixer": "^10.4.21",
 		"postcss": "^8.5.3",
 		"prettier": "^3.5.3",

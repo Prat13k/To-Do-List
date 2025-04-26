@@ -10,7 +10,7 @@
   let newTaskPriority = 'MEDIUM';
   let showAddTask = false;
   let darkMode = false;
-  let showCompleted = true;
+  let showCompleted = false;
   let showSettings = false; // Add this to control settings view
   
   // Delete confirmation
