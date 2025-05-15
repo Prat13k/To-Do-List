@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">zotu</string>
+    <string name="title_activity_main">zotu</string>
+    <string name="package_name">com.zotu.app</string>
+    <string name="custom_url_scheme">com.zotu.app</string>
+</resources>
